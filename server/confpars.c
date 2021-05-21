@@ -629,6 +629,18 @@ int parse_statement (cfile, group, type, host_decl, declaration)
 				     (struct lease **)0);
 		return declaration;
 
+	      case SERVER_LEASE_TERMINATION:
+		skip_token(&val, (unsigned *)0, cfile);
+		if (type != SUBNET_DECL || !group -> subnet){
+			parse_warn (cfile,
+                                    "server termination declaration not allowed here");
+			skip_to_semi (cfile);
+			return declaration;
+		}
+		group -> subnet -> server_lease_termination = 1;
+		parse_warn(cfile, "Got it!");
+		return declaration;
+
 #ifdef DHCPv6
 	      case RANGE6:
 		skip_token(NULL, NULL, cfile);
