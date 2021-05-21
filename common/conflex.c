@@ -1395,11 +1395,8 @@ intern(char *atom, enum dhcp_token dfv) {
 								"identifier"))
                                                       return SERVER_IDENTIFIER;
 						if (!strcasecmp(atom + 7,
-								"lease-termination")){
-						      log_fatal("here");
+								"lease-termination"))
 						      return SERVER_LEASE_TERMINATION;
-						}
-
 						break;
 					}
 					break;

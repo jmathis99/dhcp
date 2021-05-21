@@ -621,7 +621,7 @@ int parse_statement (cfile, group, type, host_decl, declaration)
 		skip_token(&val, (unsigned *)0, cfile);
 		if (type != SUBNET_DECL || !group -> subnet) {
 			parse_warn (cfile,
-				    "range declaration not allowed here.");
+				    "range declaration not allowed here. TEST");
 			skip_to_semi (cfile);
 			return declaration;
 		}
@@ -638,7 +638,6 @@ int parse_statement (cfile, group, type, host_decl, declaration)
 			return declaration;
 		}
 		group -> subnet -> server_lease_termination = 1;
-		parse_warn(cfile, "Got it!");
 		return declaration;
 
 #ifdef DHCPv6
