@@ -635,10 +635,11 @@ int parse_statement (cfile, group, type, host_decl, declaration)
 			parse_warn (cfile,
                                     "server termination declaration not allowed here");
 			skip_to_semi (cfile);
-			return declaration;
+			break;
 		}
 		group -> subnet -> server_lease_termination = 1;
-		return declaration;
+		parse_semi (cfile);
+		break;
 
 #ifdef DHCPv6
 	      case RANGE6:
