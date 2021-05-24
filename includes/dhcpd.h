@@ -1075,7 +1075,7 @@ struct subnet {
 	struct iaddr netmask;
 	int prefix_len;			/* XXX: currently for IPv6 only */
 	struct group *group;
-	int server_lease_termination = 0;	/* If nonzero, subnet will always issue new leases when requested */
+	int server_lease_termination;	/* If nonzero, subnet will always issue new leases when requested */
 };
 
 struct collection {

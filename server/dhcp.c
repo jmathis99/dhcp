@@ -752,7 +752,7 @@ void dhcprequest (packet, ms_nulltp, ip_lease)
 
 	/* If the address the client asked for is ours, but it wasn't
 	   available for the client, NAK it. */
-	if (!lease && ours) {
+	if (!lease && ours && !subnet->server_lease_termination) {
 		log_info ("%s: lease %s unavailable.", msgbuf, piaddr (cip));
 		nak_lease (packet, &cip, (subnet ? subnet->group : NULL));
 		goto out;
