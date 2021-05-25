@@ -399,9 +399,7 @@ void dhcpdiscover (packet, ms_nulltp)
 				log_error ("%s: peer holds all free leases",
 					   msgbuf);
 			else {
-				log_error("%s: subnet stuff", msgbuf);
 				if (packet -> shared_network -> subnets -> server_lease_termination) {
-					log_error("here");
 					lease = packet -> shared_network -> pools -> active;
 					release_lease(lease, packet);
 				}
