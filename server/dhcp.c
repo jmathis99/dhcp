@@ -398,10 +398,18 @@ void dhcpdiscover (packet, ms_nulltp)
 			if (peer_has_leases)
 				log_error ("%s: peer holds all free leases",
 					   msgbuf);
-			else
-				log_error ("%s: network %s: no free leases",
-					   msgbuf,
-					   packet -> shared_network -> name);
+			else {
+				log_error("%s: subnet stuff", msgbuf);
+				if (packet -> shared_network -> subnets -> server_lease_termination) {
+					log_error("here");
+					lease = packet -> shared_network -> pools -> active;
+					release_lease(lease, packet);
+				}
+				else
+					log_error ("%s: network %s: no free leases",
+						   msgbuf,
+						   packet -> shared_network -> name);
+			}
 			return;
 		}
 	}
@@ -750,9 +758,10 @@ void dhcprequest (packet, ms_nulltp, ip_lease)
 		}
 	}
 
+
 	/* If the address the client asked for is ours, but it wasn't
 	   available for the client, NAK it. */
-	if (!lease && ours && !subnet->server_lease_termination) {
+	if (!lease && ours) {
 		log_info ("%s: lease %s unavailable.", msgbuf, piaddr (cip));
 		nak_lease (packet, &cip, (subnet ? subnet->group : NULL));
 		goto out;
