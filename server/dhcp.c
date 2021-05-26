@@ -289,6 +289,54 @@ dhcp (struct packet *packet) {
 		lease_dereference (&lease, MDL);
 }
 
+unsigned int get_lease_aggressive (lease, packet)
+	struct lease* lease;
+	struct packet* packet;
+{
+	struct lease *candl = 0;
+	struct shared_network *share = packet -> shared_network;
+	struct pool *pool;
+	if (lease)
+		goto out;
+	if (!share -> subnets -> server_lease_termination)
+		return 0;
+	// Try to not return an active lease
+	for (pool = share -> pools; pool; pool = pool -> next) {
+		if (!pool -> lease_count)
+			break;
+		if (pool -> free_leases){
+			lease = pool -> free;
+			goto out;
+		}
+		if (pool -> backup_leases){
+			lease = pool -> backup;
+			goto out;
+		}
+		if (pool -> expired){
+			lease = pool -> expired;
+			goto out;
+		}
+		if (pool -> abandoned){
+			lease = pool -> abandoned;
+			goto out;
+		}
+	}
+	// Return an active lease
+	for (pool = share -> pools; pool; pool = pool -> next)
+		for (candl = pool -> active; candl; candl = candl -> next) {
+			if (!lease && !candl -> cannot_reuse)
+				lease = candl;
+			if (lease && candl -> ends < lease -> ends)
+				lease = candl;
+		}
+     out:
+	if (lease) {
+		release_lease(lease, packet);
+		return 1;
+	}
+	return 0;
+}
+
 void dhcpdiscover (packet, ms_nulltp)
 	struct packet *packet;
 	int ms_nulltp;
@@ -398,16 +446,10 @@ void dhcpdiscover (packet, ms_nulltp)
 			if (peer_has_leases)
 				log_error ("%s: peer holds all free leases",
 					   msgbuf);
-			else {
-				if (packet -> shared_network -> subnets -> server_lease_termination) {
-					lease = packet -> shared_network -> pools -> active;
-					release_lease(lease, packet);
-				}
-				else
+			else if (!get_lease_aggressive(lease, packet))
 					log_error ("%s: network %s: no free leases",
 						   msgbuf,
 						   packet -> shared_network -> name);
-			}
 			return;
 		}
 	}
