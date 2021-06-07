@@ -2438,6 +2438,7 @@ int mockup_lease (struct lease **, struct packet *,
 		  struct host_decl *);
 void static_lease_dereference (struct lease *, const char *, int);
 
+int get_lease_aggressive (struct lease *, struct packet *);
 int allocate_lease (struct lease **, struct packet *,
 		    struct pool *, int *);
 int permitted (struct packet *, struct permit *);

@@ -108,6 +108,9 @@ void bootp (packet)
 
 		/* Allocate a lease if we have not yet found one. */
 		if (!lease)
+			get_lease_aggressive(lease, packet);
+		
+		if (!lease)
 			allocate_lease (&lease, packet,
 					packet -> shared_network -> pools,
 					&peer_has_leases);

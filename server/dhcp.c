@@ -289,7 +289,7 @@ dhcp (struct packet *packet) {
 		lease_dereference (&lease, MDL);
 }
 
-unsigned int get_lease_aggressive (lease, packet)
+int get_lease_aggressive (lease, packet)
 	struct lease* lease;
 	struct packet* packet;
 {
@@ -438,19 +438,23 @@ void dhcpdiscover (packet, ms_nulltp)
 	}
 #endif
 
+	if (!lease)
+		get_lease_aggressive(lease, packet);
+
 	/* If we didn't find a lease, try to allocate one... */
 	if (!lease) {
 		if (!allocate_lease (&lease, packet,
 				     packet -> shared_network -> pools,
 				     &peer_has_leases)) {
-			if (peer_has_leases)
+			if (peer_has_leases) 
 				log_error ("%s: peer holds all free leases",
 					   msgbuf);
-			else if (!get_lease_aggressive(lease, packet))
-					log_error ("%s: network %s: no free leases",
-						   msgbuf,
-						   packet -> shared_network -> name);
+			else
+				log_error ("%s: network %s: no free leases",
+					   msgbuf,
+					   packet -> shared_network -> name);
 			return;
+			
 		}
 	}
 
@@ -3469,6 +3473,10 @@ void ack_lease (packet, lease, offer, when, msg, ms_nulltp, hp)
 			data_string_forget (&d1, MDL);
 		}
 	}
+	else if (lease -> subnet -> shared_network -> interface -> address_count)
+		state -> siaddr = lease -> subnet -> shared_network -> interface -> addresses[0];
+	else if (packet -> interface -> address_count)
+		state -> siaddr = packet -> interface -> addresses[0];
 
 	/* Use the subnet mask from the subnet declaration if no other
 	   mask has been provided. */
