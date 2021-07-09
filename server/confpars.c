@@ -621,7 +621,7 @@ int parse_statement (cfile, group, type, host_decl, declaration)
 		skip_token(&val, (unsigned *)0, cfile);
 		if (type != SUBNET_DECL || !group -> subnet) {
 			parse_warn (cfile,
-				    "range declaration not allowed here. TEST");
+				    "range declaration not allowed here. ");
 			skip_to_semi (cfile);
 			return declaration;
 		}
